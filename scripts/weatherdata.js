@@ -10,19 +10,15 @@ export async function getWeather({ hourly = false, days = 0, query = currentConf
     let apiDefaultParameters = {
         dataUnit: 'us', //metric, us, uk
         location: currentConfig.location,
-        date: addDays(currentConfig.startdate, days),
-        dateFinal: addDays(currentConfig.startdate, query),
-        include: "&include=alerts%2Cdays%2Cevents"
+        date: addDays(currentConfig.startdate, days)
     }
-    if (hourly) apiDefaultParameters.include += '%2Chours'
-
     if (mode === 'basic' && !apiParameters) {
         apiParameters = setClimateWater(currentConfig.climate, days)
     }
     apiParameters = { ...apiDefaultParameters, ...apiParameters }
 
     //&lang=id
-    let url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${apiParameters.location}/${apiParameters.date}/${apiParameters.dateFinal}?unitGroup=${apiParameters.dataUnit}${apiParameters.include}&key=${weatherAPIKey}&contentType=json`
+    let url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${apiParameters.location}/${apiParameters.date}?unitGroup=${apiParameters.dataUnit}&key=${weatherAPIKey}&contentType=json`
 
     let apiCall = await fetch(url, {
         "method": "GET",

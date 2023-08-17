@@ -74,7 +74,7 @@ const temperate = {
     seasons: northernH
 }
 const continental = {
-    representativeLocation: 'Helsinki',
+    representativeLocation: 'Berlin',
     seasons: northernH
 }
 const polar = {
