@@ -98,9 +98,9 @@ function precType(temperature, humidity, isSnow) {
     return precStr + ', '
 }
 
-export function addDays(date, days) {
-    let result = new Date(date);
-    result.setUTCDate(result.getUTCDate() + days);
+export function getApiDate(year, days) {
+    let result = new Date(year, 0, 1);
+    result.setDate(result.getDate() + days);
     return dateToString(result)
 }
 

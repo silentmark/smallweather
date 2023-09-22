@@ -1,10 +1,7 @@
-import { ConfigApp } from "./config.js";
 import { MODULE } from "./const.js"
 import { weatherUpdate } from "./smallweather.js";
 
-export let mode = 'basic';
-export let weatherAPIKey = null;
-export let currentWeather = {
+export let defaultWeather = {
     feelslikeC: 20,
     feelslikemaxC: 25,
     feelslikeminC: 17,
@@ -12,18 +9,20 @@ export let currentWeather = {
     windspeedFriendly: 'Gentle Breeze',
     conditions: 'clear',
     unit: 'F',
-    icon: 'clear-day'
+    icon: 'clear-day',
+    timestamp: 0
 };
-export let system = 'us'
-export let currentConfig = {
-    location: 'Havana',
-    startdate: '2009-01-01',
-    querylength: '1',
-    climate: 'tropical'
-}
 
-export let debug = false
-export let allowPlayers = false
+export let localCacheSettings = {}; 
+localCacheSettings.mode = 'hourly';
+localCacheSettings.system = 'us';
+localCacheSettings.location = 'Berlin';
+localCacheSettings.startingYear = '2020';
+localCacheSettings.currentWeather = defaultWeather;
+localCacheSettings.weatherAPIKey = '';
+localCacheSettings.debug = false;
+localCacheSettings.allowPlayers = true;
+localCacheSettings.show = false;
 
 export function registerSettings() {
     game.settings.register(MODULE, 'weatherAPIKey', {
@@ -38,6 +37,7 @@ export function registerSettings() {
             cacheSettings();
         },
     });
+
     game.settings.register(MODULE, 'unitSystem', {
         name: 'Unit System',
         hint: `Choose the unit system.`,
@@ -48,59 +48,84 @@ export function registerSettings() {
             "us": "Imperial/US",
             "metric": "Metric"
         },
-        default: system,
+        default: "us",
         restricted: true,
         onChange: async () => {
             cacheSettings();
             await weatherUpdate(0, false, false);
         },
     });
+
     game.settings.register(MODULE, 'allowPlayers', {
         name: 'Allow Players To See Weather App ',
         hint: `Allow players to have the weather app and see the current weather information.`,
         scope: 'world',
         config: true,
         type: Boolean,
-        default: allowPlayers,
+        default: true,
         restricted: true,
         onChange: () => {
             cacheSettings();
         },
     });
-    game.settings.registerMenu(MODULE, "weatherApiConfig", {
-        name: "Weather API Configuration",
-        label: "Weather API",
-        hint: "Dialog for API fetch configuration, this can be accessed in the module floating window too.",
-        icon: 'fas fa-cogs',
-        type: ConfigApp,
-        restricted: true
+    
+    game.settings.register(MODULE, 'queryMode', {
+        name: 'Query Mode',
+        hint: `Choose the update frequency hourly or daily.`,
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            "hourly": "Hourly",
+            "daily": "Daily"
+        },
+        default: "hourly",
+        restricted: true,
+        onChange: async () => {
+            cacheSettings();
+            await weatherUpdate();
+        },
     });
 
+    game.settings.register(MODULE, 'location', {
+        name: 'Source Location',
+        hint: `Location that will be used for querying the weather history. Choose a location that will fit your climate.`,
+        scope: 'world',
+        config: true,
+        type: String,
+        default: 'Berlin',
+        restricted: true,
+        onChange: () => {
+            cacheSettings();
+        },
+    });
+
+    game.settings.register(MODULE, 'startingYear', {
+        name: 'Starting Year',
+        hint: `Year that will be used for querying the weather history. Month, day and hour will be calculated based on SimpleCalendar configuration.`,
+        scope: 'world',
+        config: true,
+        type: String,
+        default: '2020',
+        restricted: true,
+        onChange: () => {
+            cacheSettings();
+        },
+    });
 
     game.settings.register(MODULE, 'currentWeather', {
-        name: 'weatherData',
+        name: 'currentWeather',
         hint: '',
         scope: 'world',
         config: false,
         type: Object,
-        default: currentWeather,
+        default: defaultWeather,
         restricted: true,
         onChange: () => {
             cacheSettings();
         },
     });
-    game.settings.register(MODULE, 'mode', {
-        name: 'mode',
-        hint: '',
-        scope: 'world',
-        config: false,
-        type: String,
-        default: mode,
-        restricted: true,
-        onChange: () => {
-            cacheSettings();
-        },
-    });
+
     game.settings.register(MODULE, 'show', {
         name: 'show',
         hint: '',
@@ -113,23 +138,7 @@ export function registerSettings() {
             cacheSettings();
         },
     });
-
-    /**********************
-    CONFIG WINDOW SETTINGS
-    **********************/
-    game.settings.register(MODULE, 'currentConfig', {
-        name: 'currentConfig',
-        hint: ``,
-        scope: 'world',
-        config: false,
-        type: Object,
-        default: currentConfig,
-        restricted: true,
-        onChange: () => {
-            cacheSettings();
-        },
-    });
-
+    
     /**********************
     DEBUG
     **********************/
@@ -149,11 +158,14 @@ export function registerSettings() {
 
 // function that get the settings options and assign to the variables
 export async function cacheSettings() {
-    mode = game.settings.get(MODULE, 'mode');
-    system = game.settings.get(MODULE, 'unitSystem');
-    currentWeather = game.settings.get(MODULE, 'currentWeather');
-    weatherAPIKey = game.settings.get(MODULE, 'weatherAPIKey');
-    currentConfig = game.settings.get(MODULE, 'currentConfig');
-    debug = game.settings.get(MODULE, 'debug');
-    allowPlayers = game.settings.get(MODULE, 'allowPlayers');
+    localCacheSettings = {};
+    localCacheSettings.mode = game.settings.get(MODULE, 'mode');
+    localCacheSettings.system = game.settings.get(MODULE, 'unitSystem');
+    localCacheSettings.location = game.settings.get(MODULE, 'location');
+    localCacheSettings.startingYear = game.settings.get(MODULE, 'startingYear');
+    localCacheSettings.currentWeather = game.settings.get(MODULE, 'currentWeather');
+    localCacheSettings.weatherAPIKey = game.settings.get(MODULE, 'weatherAPIKey');
+    localCacheSettings.debug = game.settings.get(MODULE, 'debug');
+    localCacheSettings.allowPlayers = game.settings.get(MODULE, 'allowPlayers');
+    localCacheSettings.show = game.settings.get(MODULE, 'show');
 }
