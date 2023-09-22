@@ -1,7 +1,6 @@
 import { MODULE, MODULE_DIR } from "./const.js";
 import { getApiDate, treatWeatherObj } from "./util.js";
-import { allowPlayers, registerSettings, localCacheSettings, cacheSettings, system, debug, currentConfig, mode, weatherAPIKey, currentWeather } from "./settings.js";
-import { ConfigApp } from "./config.js"
+import { registerSettings, localCacheSettings, cacheSettings } from "./settings.js";
 
 let lastUpdateInfo = null;
 
@@ -12,7 +11,7 @@ Hooks.once("init", () => {
 
 Hooks.once('ready', async function () {
     console.info(" ======================================== ⛅ SmallWeather ======================================== ")
-    if (!weatherAPIKey && game.user.isGM) {
+    if (!localCacheSettings.weatherAPIKey && game.user.isGM) {
         missingAPI();
     }
 });
@@ -29,15 +28,15 @@ Hooks.on('smallweatherUpdate', async function (weather) {
 
 Hooks.on('renderSmallTimeApp', async function (app, html) {
     if (game.user.isGM)
-        await injectIntoSmallTime(currentWeather, true)
+        await injectIntoSmallTime(localCacheSettings.currentWeather, true)
     else if (allowPlayers)
-        injectIntoSmallTimePlayer(currentWeather, true)
+        injectIntoSmallTimePlayer(localCacheSettings.currentWeather, true)
 })
 
 Hooks.on(SimpleCalendar.Hooks.DateTimeChange, async function (data) {
     if (game.user.isGM) {
-        if (debug) console.info('⛅ SmallWeather Debug | SimpleCalendar.Hooks.DateTimeChange. data variable: ', data)
-        if (weatherAPIKey) {
+        if (localCacheSettings.debug) console.info('⛅ SmallWeather Debug | SimpleCalendar.Hooks.DateTimeChange. data variable: ', data)
+        if (localCacheSettings.weatherAPIKey) {
             let currentDateTimestamp = SimpleCalendar.api.dateToTimestamp(SimpleCalendar.api.getCurrentCalendar().currentDate);
             let hoursChanged = Math.floor(Math.abs((currentDateTimestamp - (lastUpdateInfo?.timestamp ?? 0))) / 3600) // check if hour changed.
             let daysChanged = Math.floor(Math.abs((currentDateTimestamp - (lastUpdateInfo?.timestamp ?? 0))) / 86400) // check if day changed.
@@ -140,9 +139,6 @@ async function injectIntoSmallTime(currentWeather, load) {
     html.find('#current-temp').on('click', async function () {
         // await weatherUpdate()
     })
-    html.find('#configWeather').on('click', async function () {
-        ConfigApp.toggleAppVis('init');
-    })
     let show = localCacheSettings.show;
     if (show) {
         $('#weather-app').addClass('show');
@@ -152,6 +148,7 @@ async function injectIntoSmallTime(currentWeather, load) {
         $("#smalltime-app .window-content").css("border-radius", "5px 0 0 5px")
     }
 }
+
 async function injectIntoSmallTimePlayer(currentWeather, load) {
     if (!load) {
         $("#weather-app").remove()
@@ -223,20 +220,17 @@ export async function weatherUpdate(data = { hours: 0, days: 0}) {
     let newWeather = await getWeather(data.days); // here we get new data but using the query size specified by the user
 
     if (typeof newWeather == 'number') return errorAPI(newWeather)
-    if (debug) console.warn("⛅ SmallWeather Debug | weatherUpdate function. variable newWeather: ", newWeather.days[0].datetime, newWeather)
-
-    if (localCacheSettings.mode == "daily") {
-        let currentWeather = newWeather.days[0];
-        currentWeather = treatWeatherObj(currentWeather, system, newWeather.days[0].feelslikemax, newWeather.days[0].feelslikemin);
-    } else {
-        let currentWeather = newWeather.days[0].hours[data.hours]
-        currentWeather = treatWeatherObj(currentWeather, system, newWeather.days[0].feelslikemax, newWeather.days[0].feelslikemin);
+    if (localCacheSettings.debug) console.warn("⛅ SmallWeather Debug | weatherUpdate function. variable newWeather: ", newWeather.days[0].datetime, newWeather)
+    let currentWeather = newWeather.days[0];
+    if (localCacheSettings.mode == "hourly") {
+        currentWeather = newWeather.days[0].hours[data.hours]
     }
+    currentWeather = treatWeatherObj(currentWeather, localCacheSettings.system, newWeather.days[0].feelslikemax, newWeather.days[0].feelslikemin);
 
     await game.settings.set(MODULE, "currentWeather", currentWeather)
     cacheSettings();
 
-    if (debug) console.info("⛅ SmallWeather Debug | weatherUpdate function. variable currentWeather: ", currentWeather)
+    if (localCacheSettings.debug) console.info("⛅ SmallWeather Debug | weatherUpdate function. variable currentWeather: ", currentWeather)
     await injectIntoSmallTime(currentWeather)
 }
 
@@ -293,7 +287,7 @@ function handleWeatherApp(weather) {
 }
 
 async function getWeather(days = 0, apiParameters = {}) {
-    if (!weatherAPIKey) return
+    if (!localCacheSettings.weatherAPIKey) return
 
     let apiDefaultParameters = {
         dataUnit: 'us', //metric, us, uk
@@ -316,7 +310,7 @@ async function getWeather(days = 0, apiParameters = {}) {
     let response = await apiCall.json()
 
     cacheWeatherData(response);
-    if (debug) {
+    if (localCacheSettings.debug) {
         console.warn("⛅ SmallWeather Debug | async function getWeather. Api Parameters Data", apiParameters.location, apiParameters.date, apiParameters.dateFinal, apiParameters)
         console.warn("⛅ SmallWeather Debug | async function getWeather. variable simpleCalendarData: ", simpleCalendarData)
         console.warn(url)

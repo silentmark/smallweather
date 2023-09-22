@@ -52,7 +52,6 @@ export function registerSettings() {
         restricted: true,
         onChange: async () => {
             cacheSettings();
-            await weatherUpdate(0, false, false);
         },
     });
 
@@ -69,7 +68,7 @@ export function registerSettings() {
         },
     });
     
-    game.settings.register(MODULE, 'queryMode', {
+    game.settings.register(MODULE, 'mode', {
         name: 'Query Mode',
         hint: `Choose the update frequency hourly or daily.`,
         scope: 'world',
@@ -83,7 +82,6 @@ export function registerSettings() {
         restricted: true,
         onChange: async () => {
             cacheSettings();
-            await weatherUpdate();
         },
     });
 
@@ -148,7 +146,7 @@ export function registerSettings() {
         scope: 'world',
         config: true,
         type: Boolean,
-        default: debug,
+        default: false,
         restricted: true,
         onChange: () => {
             cacheSettings();
@@ -157,7 +155,7 @@ export function registerSettings() {
 }
 
 // function that get the settings options and assign to the variables
-export async function cacheSettings() {
+export function cacheSettings() {
     localCacheSettings = {};
     localCacheSettings.mode = game.settings.get(MODULE, 'mode');
     localCacheSettings.system = game.settings.get(MODULE, 'unitSystem');
