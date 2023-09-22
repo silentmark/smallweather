@@ -1,8 +1,4 @@
-import { MODULE, MODULE_DIR } from "./const.js";
-import { debug, cacheSettings } from "./settings.js";
-
 export function treatWeatherObj(currentWeather, system, feelslikemax, feelslikemin) {
-    // if ( currentWeather.windspeed == null || currentWeather.winddir == null || currentWeather.feelslike == null ) return
     currentWeather.windspeedFriendly = stringfyWindSpeed(currentWeather.windspeed)
     currentWeather.winddirFriendly = stringfyWindDir(currentWeather.winddir)
     currentWeather.feelslikeC = roundNoFloat(fahrToCelsius(system, currentWeather.feelslike))

@@ -2,9 +2,7 @@
   "id": "smallweather",
   "title": "SmallWeather",
   "description": "This module...",
-  "version": "This is auto replaced",
-  "library": "false",
-  "manifestPlusVersion": "1.2.0",
+  "version": "0.0.9",
   "compatibility": {
     "minimum": "10",
     "verified": "10"
@@ -14,28 +12,25 @@
       "name": "winterwulf",
       "url": "https://github.com/LeafWulf/",
       "discord": "winterwulf#3118",
-      "ko-fi": "winterwulf",
-      "twitter": "@odragaoverde"
+      "flags": {}
     }
   ],
   "relationships": {
-    "systems": [],
     "requires": [
       {
         "id": "foundryvtt-simple-calendar",
-        "type": "module"
+        "type": "module",
+        "compatibility": {}
       },
       {
         "id": "smalltime",
-        "type": "module"
+        "type": "module",
+        "compatibility": {}
       }
     ]
   },
   "esmodules": [
     "scripts/smallweather.js"
-  ],
-  "scripts": [
-    "scripts/lib/lib.js"
   ],
   "styles": [
     "styles/smallweather.css",
@@ -46,25 +41,29 @@
     {
       "lang": "en",
       "name": "English",
-      "path": "languages/en.json"
+      "path": "languages/en.json",
+      "flags": {}
     }
   ],
   "socket": true,
-  "url": "This is auto replaced",
-  "manifest": "This is auto replaced",
-  "download": "This is auto replaced",
+  "url": "https://github.com/LeafWulf/smallweather",
+  "manifest": "https://github.com/LeafWulf/smallweather/releases/latest/download/module.json",
+  "download": "https://github.com/LeafWulf/smallweather/releases/download/0.0.9/module.zip",
   "license": "https://github.com/LeafWulf/smallweather/blob/master/LICENSE",
   "readme": "https://github.com/LeafWulf/smallweather/blob/master/README.md",
-  "changelog": "https://github.com/LeafWulf/smallweather/blob/master/CHANGELOG.md",
   "bugs": "https://github.com/LeafWulf/smallweather/issues",
   "media": [
     {
       "type": "icon",
-      "url": "https://raw.githubusercontent.com/LeafWulf/smallweather/master/readme/icon.png"
+      "url": "https://raw.githubusercontent.com/LeafWulf/smallweather/master/readme/icon.png",
+      "loop": false,
+      "flags": {}
     },
     {
       "type": "cover",
-      "url": "https://raw.githubusercontent.com/LeafWulf/smallweather/master/readme/cover.png"
+      "url": "https://raw.githubusercontent.com/LeafWulf/smallweather/master/readme/cover.png",
+      "loop": false,
+      "flags": {}
     }
   ]
 }

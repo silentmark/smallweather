@@ -3,7 +3,6 @@ import { debug, cacheSettings, mode, system, currentConfig, currentWeather, weat
 import { treatWeatherObj, dateToString, addDays, unit, stringfyWindDir, stringfyWindSpeed, roundNoFloat, fahrToCelsius, capitalizeFirstLetter, stringfyWeather, inToMm } from "./util.js";
 import { setClimateWater } from "./climate.js";
 import { weatherUpdate, missingAPI, errorAPI } from "./smallweather.js";
-import { getWeather } from "./weatherdata.js";
 
 export class ConfigApp extends FormApplication {
     static _isOpen = true;
@@ -12,19 +11,12 @@ export class ConfigApp extends FormApplication {
         super();
     }
 
-    // render(force = false, options = {}) {
-    //     if (!weatherAPIKey) return missingAPI()
-    //     else super.render(force, options);
-    // }
-
     async _render(force = false, options = {}) {
         if (!weatherAPIKey) return missingAPI()
         else {
             await super._render(force, options);
             ConfigApp._isOpen = true;
         }
-        // Remove the window from candidates for closing via Escape.
-        // delete ui.windows[this.appId];
     }
 
     /********************************
@@ -45,14 +37,6 @@ export class ConfigApp extends FormApplication {
         console.log(formData)
         this.currentConfig = formData
     }
-    // async _onSubmit(ev, formData)
-    // {
-    //if (debug) console.info(ev, formData)
-    // }
-    // async _onChangeInput(ev, formData)
-    // {
-    //if (debug) console.info(ev, formData)
-    // }
 
     static get defaultOptions() {
         this.initialPosition = {
@@ -84,26 +68,6 @@ export class ConfigApp extends FormApplication {
         let app = ui.activeWindow
 
         if (!game.modules.get('smallweather').configApp) game.modules.get('smallweather').configApp = app
-
-        // if (!app.previewWeather) html.find('#weather-preview').css("display", "none")
-
-        // if (debug) console.info('==============================================THIS', this)
-        // this.appWindow = document.getElementById('sw-config')
-        // this.appWindow.querySelector("#sw-config-save")?.addEventListener('click', async function () {
-        //     await ConfigApp.writeInputValuesToObjects(document.getElementById('sw-config'))
-        // })
-
-        // $('#sw-config-save').on('click', async function () {
-        //     ConfigApp.writeInputValuesToObjects(document.getElementById('sw-config'))
-        // }) 
-
-        // $('.item').on('click', async function () {
-        //     // console.info(this)
-        // })
-
-        // let climateOptions = Array.from ($('select[name="climate"]')[0].options)
-        // climateOptions.find(i=> i.value === climate).selected = true
-
         let climate = game.settings.get(MODULE, 'currentConfig')?.climate || 'tropical'
         let climateOptions = Array.from(html.find('select[name="climate"]')[0])
         climateOptions.find(i => i.value === climate).selected = true
@@ -116,8 +80,7 @@ export class ConfigApp extends FormApplication {
             if (previewValue) {
                 await game.settings.set(MODULE, 'currentConfig', app.currentConfig);
                 cacheSettings();
-                await weatherUpdate({ queryLength: parseInt(previewValue), hours: currentHour, fetchAPI: app.currentConfig.hourly, cacheData: false }, app.previewWeather)
-                // This was caching the weather result from API, but also spending more querycost because this gets the whole period, the new function call above only get the chosen date. which spend less querycost. await weatherUpdate({ days: previewValue, hours: currentHour, fetchAPI: app.currentConfig.hourly }, app.previewWeather)
+                await weatherUpdate({ hours: currentHour, days: 0 }, app.previewWeather)
             }
             else await weatherUpdate({ hours: currentHour })
             $('#weather-preview-table').removeClass('show')
@@ -189,7 +152,6 @@ export class ConfigApp extends FormApplication {
             }
             app.previewWeather = previewWeather
             app.previewConfig = app.currentConfig
-            // html.find('#weather-preview').css("display", "flex")
             $('#weather-preview-table').addClass('show')
         })
         html.find('.item[data-tab="advanced"]').on('click', async function () {
@@ -199,14 +161,7 @@ export class ConfigApp extends FormApplication {
             $('#weather-preview-table').removeClass('show')
         })
     }
-
-    async weatherUpdate({ hours = 0, days = 0, fetchAPI = true, cacheData = true, queryLength = 0 } = {}, preview = {}) {
-        let newWeather
-        newWeather = await getWeather({ days: queryLength, query: queryLength, cacheData }, preview);
-        if (debug) console.info("⛅ SmallWeather Debug | ConfigApp.weatherUpdate function. variable newWeather: ", newWeather)
-        return newWeather
-    }
-
+    
     getData() {
         // Send values to the HTML template.
         // let currentConfig = game.settings.get(MODULE, 'currentConfig')
@@ -218,7 +173,6 @@ export class ConfigApp extends FormApplication {
             querylength: currentConfig?.querylength || 1,
             today,
             currentWeather,
-            hourly: currentConfig.hourly ? 'checked' : 'unchecked',
             climate: currentConfig.climate
         }
     }

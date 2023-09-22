@@ -19,14 +19,9 @@ export let currentConfig = {
     location: 'Havana',
     startdate: '2009-01-01',
     querylength: '1',
-    climate: 'tropical',
-    hourly: false
+    climate: 'tropical'
 }
 
-export let lastDateUsed
-export let apiWeatherData
-export let simpleCalendarData
-export let apiParametersCache
 export let debug = false
 export let allowPlayers = false
 
@@ -134,54 +129,6 @@ export function registerSettings() {
             cacheSettings();
         },
     });
-    game.settings.register(MODULE, 'apiWeatherData', {
-        name: 'apiWeatherData',
-        hint: ``,
-        scope: 'world',
-        config: false,
-        type: Object,
-        default: null,
-        restricted: true,
-        onChange: () => {
-            cacheSettings();
-        },
-    });
-    game.settings.register(MODULE, 'simpleCalendarData', {
-        name: 'simpleCalendarData',
-        hint: ``,
-        scope: 'world',
-        config: false,
-        type: Object,
-        default: '',
-        restricted: true,
-        onChange: () => {
-            cacheSettings();
-        },
-    });
-    game.settings.register(MODULE, 'apiParametersCache', {
-        name: 'apiParametersCache',
-        hint: ``,
-        scope: 'world',
-        config: false,
-        type: Object,
-        default: '',
-        restricted: true,
-        onChange: () => {
-            cacheSettings();
-        },
-    });
-    game.settings.register(MODULE, 'lastDateUsed', {
-        name: 'lastDateUsed',
-        hint: ``,
-        scope: 'world',
-        config: false,
-        type: Number,
-        default: '',
-        restricted: true,
-        onChange: () => {
-            cacheSettings();
-        },
-    });
 
     /**********************
     DEBUG
@@ -207,10 +154,6 @@ export async function cacheSettings() {
     currentWeather = game.settings.get(MODULE, 'currentWeather');
     weatherAPIKey = game.settings.get(MODULE, 'weatherAPIKey');
     currentConfig = game.settings.get(MODULE, 'currentConfig');
-    apiWeatherData = game.settings.get(MODULE, 'apiWeatherData');
-    simpleCalendarData = game.settings.get(MODULE, 'simpleCalendarData');
     debug = game.settings.get(MODULE, 'debug');
     allowPlayers = game.settings.get(MODULE, 'allowPlayers');
-    apiParametersCache = game.settings.get(MODULE, 'apiParametersCache');
-    lastDateUsed = game.settings.get(MODULE, 'lastDateUsed');
 }

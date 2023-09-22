@@ -1,6 +1,4 @@
-import { MODULE, MODULE_DIR } from "./const.js";
 import { addDays } from "./util.js";
-import { weatherAPIKey, currentConfig, debug, cacheSettings, system } from "./settings.js";
 
 export function setClimateWater(climate, days) {
     let simpleCalendarData = {
@@ -15,13 +13,12 @@ export function setClimateWater(climate, days) {
     let syncSeasonOffset = fantasyDayOfTheYear - seasonStartDayOfTheYear
 
     climate = eval(climate)
-    let basicParameters = { //preciso arrumar uma solução pra evolução do ano e lidar com erro de quando acabar api do dia.
+    let basicParameters = {
         location: climate.representativeLocation,
-        date: `2020-${climate.seasons[currentSeason.icon].startingMonth}-${climate.seasons[currentSeason.icon].startingDay}`,
+        date: `2022-${climate.seasons[currentSeason.icon].startingMonth}-${climate.seasons[currentSeason.icon].startingDay}`,
         dateFinal: ''
     }
     basicParameters.date = addDays(basicParameters.date, syncSeasonOffset + days)
-
     return basicParameters
 }
 
@@ -70,7 +67,7 @@ const arid = {
     seasons: northernH
 }
 const temperate = {
-    representativeLocation: 'Dublin',
+    representativeLocation: 'Amsterdam',
     seasons: northernH
 }
 const continental = {
@@ -81,5 +78,3 @@ const polar = {
     representativeLocation: 'Siglufjörður',
     seasons: northernH
 }
-
-
