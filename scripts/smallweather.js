@@ -29,7 +29,7 @@ Hooks.on('smallweatherUpdate', async function (weather) {
 Hooks.on('renderSmallTimeApp', async function (app, html) {
     if (game.user.isGM)
         await injectIntoSmallTime(localCacheSettings.currentWeather, true)
-    else if (allowPlayers)
+    else if (localCacheSettings.allowPlayers)
         injectIntoSmallTimePlayer(localCacheSettings.currentWeather, true)
 })
 
