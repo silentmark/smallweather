@@ -1,3 +1,5 @@
+import { joinEffects, availableEffects } from "./const.js";
+
 export function treatWeatherObj(currentWeather, system, feelslikemax, feelslikemin) {
     currentWeather.windspeedFriendly = stringfyWindSpeed(currentWeather.windspeed)
     currentWeather.winddirFriendly = stringfyWindDir(currentWeather.winddir)
@@ -19,6 +21,7 @@ export function inToMm(number) {
 
 // https://www.visualcrossing.com/resources/documentation/weather-data/weather-data-documentation/
 export function stringfyWeather(cloudCover, humidity, precipitation, precipProb, precipType, snow, snowDepth, temperature, visibility, dew, windSpeed, dateTime) {
+    let effects = [];
     let weatherStr = '', cloudStr = '', precStr = '', visiStr = '', icon = '';
     let weatherStrPl = '', cloudStrPl = '', precStrPl = '', visiStrPl = '';
     let obj = {}, effect = [];
@@ -33,18 +36,22 @@ export function stringfyWeather(cloudCover, humidity, precipitation, precipProb,
     else if (cloudCover <= 20 && precipProb == 0) {
         cloudStr = 'fair'
         cloudStrPl = 'przeważnie bezchmurnie'
+        effects.push(availableEffects.LightClouds)
     }
     else if (cloudCover <= 60) {
         cloudStr = 'partly cloudy'
         cloudStrPl = 'częściowo zachmurzone'
+        effects.push(availableEffects.ModerateClouds)
     }
     else if (cloudCover <= 90) {
         cloudStr = 'mostly cloudy'
         cloudStrPl = 'przeważnie zachmurzone'
+        effects.push(availableEffects.HeavyClouds)
     }
     else {
         cloudStr = 'overcast'
         cloudStrPl = 'pochmurnie'
+        effects.push(availableEffects.Overcast)
     }
 
     icon = removeSpaces(cloudStr)
@@ -60,32 +67,52 @@ export function stringfyWeather(cloudCover, humidity, precipitation, precipProb,
             if (temperature > 0 && !isSnow) {
                 precStr = 'Drizzle';
                 precStrPl = 'Mżawka';
+                effects.push(availableEffects.LightRain);
             } 
             else {
                 precStr = 'Snow grains';
                 precStrPl = 'Płatki śniegu';
+                effects.push(availableEffects.LightSnow);
             }
             precStr += ', ';
         }
         else if (precipitation < 2) {
             precStr = 'Light ' + precType(temperature, humidity, isSnow).precStr;
             precStrPl = 'Lekkie opady ' + precType(temperature, humidity, isSnow).precStrPl;
+            if (isSnow) {
+                effects.push(availableEffects.ModerateSnow);
+            } else {
+                effects.push(availableEffects.ModerateRain);
+            }
         }
         else if (precipitation <= 7.5) {
             precStr = 'Moderate ' + precType(temperature, humidity, isSnow).precStr;
             precStrPl = 'Umiarkowane opady ' + precType(temperature, humidity, isSnow).precStrPl;
+            if (isSnow) {
+                effects.push(availableEffects.HeavySnow);
+            } else {
+                effects.push(availableEffects.HeavyRain);
+            }
         }
         else if (precipitation > 7.5 && precipitation <= 16) {
             precStr = 'Heavy ' + precType(temperature, humidity, isSnow).precStr;
             precStrPl = 'Intensywne opady ' + precType(temperature, humidity, isSnow).precStrPl;
+            if (isSnow) {
+                effects.push(availableEffects.BlusterSnow);
+            } else {
+                effects.push(availableEffects.BlusterRain);
+            }
         }
         else if (temperature < 0 && isSnow) {
             precStr = 'Blizzard, '// more study for this case
             precStrPl = 'Burza śnieżna, '
+            effects.push(availableEffects.WhiteoutSnow)
         }
         else {
             precStr = 'Thunderstorm, ' // Still gotta account for hailstorm. 
             precStrPl = 'Burza z piorunami, '
+            effects.push(availableEffects.Lightning)
+            effects.push(availableEffects.BlusterRain);
         }
     }
 
@@ -100,14 +127,17 @@ export function stringfyWeather(cloudCover, humidity, precipitation, precipProb,
             if (visibility <= 0.63 && Math.abs(temperature - dew) <= 2.5) {
                 visiStr = ', with fog'
                 visiStrPl = ', z mgłą'
+                effects.push(availableEffects.LightFog);
             }
             else if (visibility >= 1.26 && visibility < 3.1 && humidity >= 60) {
                 visiStr = ', with mist'
                 visiStrPl = ', z mgiełką'
+                effects.push(availableEffects.ModerateFog);
             }
             else if (visibility < 3.1 && humidity < 60) {
                 visiStr = ', with haze'
                 visiStrPl = ', z zamgleniem'
+                effects.push(availableEffects.HeavyFog);
             }
         }
     }
@@ -121,6 +151,11 @@ export function stringfyWeather(cloudCover, humidity, precipitation, precipProb,
     weatherStrPl = precStrPl + cloudStrPl + visiStrPl;
 
     obj.weatherStr = capitalizeFirstLetter(weatherStrPl)
+    let combinedEffect = effects[0];
+    for (let i = 1; i < effects.length; i++) {
+        combinedEffect = joinEffects(combinedEffect, effects[i]);
+    }
+    obj.fxEffect = combinedEffect;
     obj.icon = icon
     obj.effect = effect
     return obj

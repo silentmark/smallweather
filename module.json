@@ -2,10 +2,10 @@
   "id": "smallweather",
   "title": "SmallWeather",
   "description": "This module...",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "compatibility": {
     "minimum": "10",
-    "verified": "10"
+    "verified": "11"
   },
   "authors": [
     {
