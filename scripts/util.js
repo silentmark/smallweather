@@ -75,6 +75,7 @@ export function stringfyWeather(cloudCover, humidity, precipitation, precipProb,
                 effects.push(availableEffects.LightSnow);
             }
             precStr += ', ';
+            precStrPl += ', ';
         }
         else if (precipitation < 2) {
             precStr = 'Light ' + precType(temperature, humidity, isSnow).precStr;
