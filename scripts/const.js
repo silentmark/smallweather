@@ -32,6 +32,7 @@ export const ModuleSocketName = `module.${MODULE}`;
   // weather options
   export const availableEffects = {
     LightClouds: {
+      name: 'swr-light-clouds',
       core: null,
       fxMaster: [
         {
@@ -52,6 +53,7 @@ export const ModuleSocketName = `module.${MODULE}`;
   
     ModerateClouds: {
       core: null,
+      name: 'swr-moderate-clouds',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -71,6 +73,7 @@ export const ModuleSocketName = `module.${MODULE}`;
   
     HeavyClouds: {
       core: null,
+      name: 'swr-heavy-clouds',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -90,6 +93,7 @@ export const ModuleSocketName = `module.${MODULE}`;
   
     StormClouds: {
       core: null,
+      name: 'swr-storm-clouds',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -109,6 +113,7 @@ export const ModuleSocketName = `module.${MODULE}`;
   
     Overcast: {
       core: null,
+      name: 'swr-overcast',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -128,6 +133,7 @@ export const ModuleSocketName = `module.${MODULE}`;
     // drifting around, not linear
     BlusterWind: {
       core: null,
+      name: 'swr-bluster-wind',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -147,6 +153,7 @@ export const ModuleSocketName = `module.${MODULE}`;
     // snow in each direction
     BlusterSnow: {
       core: { effect: 'snow' },
+      name: 'swr-bluster-snow',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -205,6 +212,7 @@ export const ModuleSocketName = `module.${MODULE}`;
   
     LightWind: {
       core: null,
+      name: 'swr-light-wind',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -224,6 +232,7 @@ export const ModuleSocketName = `module.${MODULE}`;
   
     ModerateWind: {
       core: null,
+      name: 'swr-moderate-wind',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -243,6 +252,7 @@ export const ModuleSocketName = `module.${MODULE}`;
   
     HeavyWind: {
       core: null,
+      name: 'swr-heavy-wind',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -261,9 +271,8 @@ export const ModuleSocketName = `module.${MODULE}`;
     },
   
     BlusterRain: { 
-      core: {
-        effect: 'rain'
-      }, 
+      core: { effect: 'rain' }, 
+      name: 'swr-bluster-rain',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -319,10 +328,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ],
     },
+
     LightRain: { 
-      core: {
-        effect: 'rain'
-      },
+      core: { effect: 'rain' },
+      name: 'swr-light-rain',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -339,10 +348,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ],
     },
+
     ModerateRain: { 
-      core: {
-        effect: 'rainStorm'
-      },
+      core: { effect: 'rainStorm' },
+      name: 'swr-moderate-rain',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -359,10 +368,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ]
     },
+
     HeavyRain: {
-      core: {
-        effect: 'rainStorm'
-      },
+      core: { effect: 'rainStorm' },
+      name: 'swr-heavy-rain',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -379,10 +388,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ]
     },
+    
     LightFog: { 
-      core: {
-        effect: 'fog'
-      },
+      core: { effect: 'fog' },
+      name: 'swr-light-fog',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -398,10 +407,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ]
     },
+
     ModerateFog: { 
-      core: {
-        effect: 'fog'
-      },
+      core: { effect: 'fog' },
+      name: 'swr-moderate-fog',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -417,10 +426,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ]
     },
+
     HeavyFog: { 
-      core: {
-        effect: 'fog'
-      },
+      core: { effect: 'fog' },
+      name: 'swr-heavy-fog',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -436,10 +445,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ]
     },
+
     RollingFog: { 
-      core: {
-        effect: 'fog'
-      },
+      core: { effect: 'fog' },
+      name: 'swr-rolling-fog',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -455,8 +464,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ]
     },
+
     Lightning: {
       core: null,
+      name: 'swr-lightning',
       fxMaster: [
         {
           style: FXMStyleTypes.Filter,
@@ -472,6 +483,7 @@ export const ModuleSocketName = `module.${MODULE}`;
   
     Wildfire: {
       core: null,
+      name: 'swr-wildfire',
       fxMaster: [
         // use lightning to make a flicker
         {
@@ -499,9 +511,8 @@ export const ModuleSocketName = `module.${MODULE}`;
     },
   
     LightSnow: { 
-      core: {
-        effect: 'snow'
-      },
+      core: { effect: 'snow' },
+      name: 'swr-light-snow',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -518,10 +529,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ],
     },
+
     ModerateSnow: { 
-      core: {
-        effect: 'snow'
-      },
+      core: { effect: 'snow' },
+      name: 'swr-moderate-snow',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -538,10 +549,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ],
     },
+
     HeavySnow: { 
-      core: {
-        effect: 'blizzard'
-      },
+      core: { effect: 'blizzard' },
+      name: 'swr-heavy-snow',
       fxMaster: [
         // two different snow effects
         {
@@ -572,10 +583,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ],
     },
+
     WhiteoutSnow: { 
-      core: {
-        effect: 'blizzard'
-      },
+      core: { effect: 'blizzard' },
+      name: 'swr-whiteout-snow',
       // two different snow effects plus fog
       fxMaster: [
         {
@@ -618,10 +629,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ],
     },
+
     Hail: { 
-      core: {
-        effect: 'rainStorm'
-      },
+      core: { effect: 'rainStorm' },
+      name: 'swr-hail',
       fxMaster: [{
         style: FXMStyleTypes.Particle,
         type: FXMParticleTypes.RainSimple,
@@ -636,10 +647,10 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       }],
     },
+
     Sleet: { 
-      core: {
-        effect: 'rainStorm'
-      },
+      core: { effect: 'rainStorm' },
+      name: 'swr-sleet',
       // rain plus snow
       fxMaster: [
         {
@@ -670,11 +681,11 @@ export const ModuleSocketName = `module.${MODULE}`;
         },
       ]
     },
+
     // like a colored blizzard, with smaller particles
     DustStorm: { 
-      core: {
-        effect: ''
-      },  
+      core: { effect: '' },
+      name: 'swr-dust-storm',
       fxMaster: [
         {
           style: FXMStyleTypes.Particle,
@@ -729,7 +740,8 @@ export const ModuleSocketName = `module.${MODULE}`;
       output.core = { effect: '' };
     if (!output.fxMaster)
       output.fxMaster = [];
-  
+    
+    output.name = (effect1.name || '') + '-' + (effect2.name || '');
     output.core.effect = output.core?.effect || effect2.core?.effect || '';
     output.fxMaster = output.fxMaster.concat(effect2.fxMaster || []);
   

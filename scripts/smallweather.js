@@ -1,16 +1,20 @@
-import { MODULE, MODULE_DIR, FXMStyleTypes } from "./const.js";
+import { MODULE, MODULE_DIR, FXMStyleTypes, joinEffects, availableEffects } from "./const.js";
 import { getApiDate, treatWeatherObj } from "./util.js";
 import { registerSettings, localCacheSettings, cacheSettings } from "./settings.js";
 
 let lastUpdateInfo = null;
-
 let sceneReady = false;
-let activeFXMParticleEffects = []; // string[] = [];   // names of the active particle effects (so we can turn off)
-let activeFXMFilterEffects = []; //string[] = [];   // names of the active filter effects (so we can turn off)
 
 Hooks.once("init", () => {
     registerSettings();
     cacheSettings();
+});
+
+Hooks.on('canvasReady', async function () {
+    sceneReady = true;
+    if (localCacheSettings.fx && localCacheSettings.currentWeather) {
+      await activateFX(localCacheSettings.currentWeather);
+    }
 });
 
 Hooks.once('ready', async function () {
@@ -149,6 +153,7 @@ async function injectIntoSmallTime(currentWeather, load) {
         $('#rightHandle').css("width", "331px")
         $("#smalltime-app .window-content").css("border-radius", "5px 0 0 5px")
     }
+    await activateFX(currentWeather);
 }
 
 export async function weatherUpdate(data = { hours: 0, days: 0}) {
@@ -274,8 +279,13 @@ async function activateFX(weatherData) {
     if (!weatherData)
       return;
 
-// TODO: GET EFFECT OPTION FROM WEATHER DATA
-    const effectOptions = weatherOptions[weatherData.climate][weatherData.humidity][weatherData.hexFlowerCell].fx;
+    if (!game.scenes?.active?.getFlag(MODULE, 'auto-apply'))
+       return;
+
+    if (game.scenes?.active?.weather)
+        return;
+
+    const effectOptions = weatherData.fxEffect;
 
     if (game.user.isGM) {
         // turn off any old ones
@@ -286,9 +296,10 @@ async function activateFX(weatherData) {
 
         if (effectOptions.fxMaster) {
             const effects = effectOptions.fxMaster;
+            const fxEffects = (game.scenes?.active?.getFlag('fxmaster', 'effects') || {});
 
             for (let e = 0; e < effects.length; e++) {
-                const name = `swr-${effects[e].type}-${foundry.utils.randomID()}`;
+                const name = effectOptions.name + '-' + e;
 
                 if (effects[e].style === FXMStyleTypes.Particle) {
                     // adjust options
@@ -296,20 +307,15 @@ async function activateFX(weatherData) {
                     
                     // override direction
                     if (options.direction) {
+                        //TODO: wind direction? 
                         options.direction = Math.floor(Math.random() * (options.direction.end - options.direction.start)) + options.direction.start;
                     }
-
-                    Hooks.call('fxmaster.switchParticleEffect', {
-                        name,
-                        type: effects[e].type,
-                        options: options,
-                    });
-                    addFXMParticleEffect(name);
+                    fxEffects[name] = { type: effects[e].type, options: options };
                 } else if (effects[e].style === FXMStyleTypes.Filter) {
                     await FXMASTER.filters.addFilter(name, effects[e].type, effects[e].options);
-                    await addFXMFilterEffect(name);
                 }
             }
+            await game.scenes?.active?.setFlag('fxmaster', 'effects', fxEffects);
         }
     }
 }
@@ -319,39 +325,48 @@ async function deactivateFX() {
         // this isn't really safe because this is checking an internal setting but it's too easy to 
         //    get out of sync with FX master, in which case attempting to turn something off may actually
         //    add it instead
-        for (let i = 0; i < activeFXMParticleEffects.length; i++) {
-            const effectName = activeFXMParticleEffects[i];
-
-            if (effectName in ((getGame().scenes?.active?.getFlag('fxmaster', 'effects') || [])))
-                Hooks.call('fxmaster.switchParticleEffect', { name: activeFXMParticleEffects[i] });
+        let fxEffects = (game.scenes?.active?.getFlag('fxmaster', 'effects') || {});
+        for (let e in fxEffects) { 
+            if (e.startsWith('swr-')) {
+                delete fxEffects[e];
+                fxEffects['-=' + e] = null;
+            }
         }
-        await clearFXMParticleEffects();
-        
-        for (let i = 0; i < activeFXMFilterEffects.length; i++) {
-            const effectName = activeFXMFilterEffects[i];
-            await FXMASTER.filters.removeFilter(effectName);
+        await game.scenes?.active?.setFlag('fxmaster', 'effects', fxEffects);
+        for (let e in FXMASTER.filters.filters) {
+            if (e.startsWith('swr-')) {
+                await FXMASTER.filters.removeFilter(e);
+            }
         }
-        await clearFXMFilterEffects();
     }
 }
 
-async function addFXMParticleEffect(name) {
-    activeFXMParticleEffects.push(name);
-    await moduleSettings.set(SettingKeys.activeFXMParticleEffects, activeFXMParticleEffects);
-}
-
-async function addFXMFilterEffect(name) {
-    activeFXMFilterEffects.push(name);
-    await moduleSettings.set(SettingKeys.activeFXMFilterEffects, activeFXMFilterEffects);
-}
-
-async function clearFXMParticleEffects() {
-    activeFXMParticleEffects = [];
-    await moduleSettings.set(SettingKeys.activeFXMParticleEffects, activeFXMParticleEffects);
-}
-
-async function clearFXMFilterEffects() {
-    activeFXMFilterEffects = [];
-
-    await moduleSettings.set(SettingKeys.activeFXMFilterEffects, activeFXMFilterEffects);
-}
+Hooks.on('renderSceneConfig', async (app, html) => {
+    if (!hasProperty(app.object, `data.flags.${MODULE}.auto-apply`)) {
+        app.object.setFlag(MODULE, 'auto-apply', true);
+    }
+    const autoapplyCheckStatus = app.object.getFlag(MODULE, 'auto-apply') ? 'checked' : '';
+    const injection = `
+    <hr>
+    <style> .wfx-scene-config {
+        border: 1px solid #999;
+        border-radius: 8px;
+        margin: 8px 0;
+        padding: 0 15px 5px 15px;
+    }</style>
+    <fieldset class="wfx-scene-config">
+      <legend> <i class="fas fa-cloud-sun"></i><span>Weather FX</span> </legend>
+      <div class="form-group">
+        <label>Auto Apply</label>
+        <input
+          type="checkbox"
+          name="flags.${MODULE}.auto-apply"
+          ${autoapplyCheckStatus}>
+        <p class="notes">Autoapply weather effects from SmallWeather to scene.</p>
+      </div>
+    </fieldset>`;
+    const weatherEffect = html.find('select[name="weather"]');
+    const formGroup = weatherEffect.closest(".form-group");
+    formGroup.after(injection);
+    app.setPosition({ height: "auto" });
+})

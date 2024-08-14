@@ -6,7 +6,6 @@ export let defaultWeather = {
     feelslikeminC: 17,
     winddirFriendly: 'North',
     windspeedFriendly: 'Gentle Breeze',
-    conditions: 'clear',
     unit: 'F',
     icon: 'clear-day',
     timestamp: 0
@@ -22,6 +21,7 @@ localCacheSettings.weatherAPIKey = '';
 localCacheSettings.debug = false;
 localCacheSettings.allowPlayers = true;
 localCacheSettings.show = false;
+localCacheSettings.fx = true;
 
 export function registerSettings() {
     game.settings.register(MODULE, 'weatherAPIKey', {
@@ -135,7 +135,20 @@ export function registerSettings() {
             cacheSettings();
         },
     });
-    
+
+    game.settings.register(MODULE, 'fx', {
+        name: 'Show FX',
+        hint: `show FX`,
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+        restricted: true,
+        onChange: () => {
+            cacheSettings();
+        },
+    });
+
     /**********************
     DEBUG
     **********************/
@@ -165,4 +178,5 @@ export function cacheSettings() {
     localCacheSettings.debug = game.settings.get(MODULE, 'debug');
     localCacheSettings.allowPlayers = game.settings.get(MODULE, 'allowPlayers');
     localCacheSettings.show = game.settings.get(MODULE, 'show');
+    localCacheSettings.fx = game.settings.get(MODULE, 'fx');
 }
