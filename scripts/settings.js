@@ -1,5 +1,4 @@
 import { MODULE } from "./const.js"
-import { weatherUpdate } from "./smallweather.js";
 
 export let defaultWeather = {
     feelslikeC: 20,
@@ -130,7 +129,7 @@ export function registerSettings() {
         scope: 'client',
         config: false,
         type: Boolean,
-        default: false,
+        default: true,
         restricted: true,
         onChange: () => {
             cacheSettings();
